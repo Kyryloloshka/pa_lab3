@@ -1,117 +1,75 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { invoke} from "@tauri-apps/api/core";
-
-interface Record {
-  key: number;
-  data: string;
-}
+import { onMounted, ref } from "vue";
+import AddRecordDialog from "./components/AddRecordDialog.vue";
+import type { Record } from "./types";
+import { loadAllRecordsApi, findRecordApi, updateRecordApi, deleteRecordApi } from "./services/api.ts";
 
 const key = ref<number | null>(null);
-const data = ref<string>('');
+const data = ref<string>("");
 const record = ref<Record | null>(null);
-const records = ref<Record[]>([{key: 0, data: 'test'}]);
-
-async function addRecord() {
-  if (key.value !== null && data.value) {
-    try {
-      await invoke("add_record", { key: key.value, data: data.value });
-      await loadAllRecords(); // Перезавантажити всі записи
-      clearInputs();
-    } catch (error) {
-      console.error("Error adding record:", error);
-    }
-  } else {
-    alert("Please provide both key and data.");
-  }
-}
-
-async function findRecord() {
-  if (key.value !== null) {
-    try {
-      record.value = await invoke("find_record", { key: key.value });
-      if (!record.value) {
-      }
-    } catch (error) {
-      console.error("Error finding record:", error);
-    }
-  } else {
-    alert("Please provide a key to search.");
-  }
-}
-
-async function deleteRecord() {
-  if (key.value !== null) {
-    try {
-      await invoke("delete_record", { key: key.value });
-      await loadAllRecords(); // Перезавантажити всі записи
-      clearInputs();
-    } catch (error) {
-      console.error("Error deleting record:", error);
-    }
-  } else {
-    alert("Please provide a key to delete.");
-  }
-}
-
-async function updateRecord() {
-  if (key.value !== null && data.value) {
-    try {
-      await invoke("update_record", { key: key.value, new_data: data.value });
-      await loadAllRecords(); // Перезавантажити всі записи
-      clearInputs();
-    } catch (error) {
-      console.error("Error updating record:", error);
-    }
-  } else {
-    alert("Please provide both key and new data.");
-  }
-}
-
-async function loadAllRecords() {
-  try {
-    const allRecords = await invoke<Record[]>("get_all_records");
-    records.value = allRecords;
-  } catch (error) {
-    console.error("Error loading records:", error);
-  }
-}
+const records = ref<Record[]>([]);
 
 function clearInputs() {
   key.value = null;
-  data.value = '';
+  data.value = "";
   record.value = null;
 }
 
 onMounted(() => {
-  loadAllRecords();
+  loadAllRecordsApi(records);
 });
+
+async function findRecord() {
+  await findRecordApi(key, record);
+}
+
+async function deleteRecord() {
+  await deleteRecordApi(key);
+  await loadAllRecordsApi(records);
+  clearInputs();
+}
+
+async function updateRecord() {
+  if (key.value !== null) {
+    await updateRecordApi(key, { key: key.value, data: data.value });
+    await loadAllRecordsApi(records);
+    clearInputs();
+  } else {
+    alert("Please provide both key and new data.");
+  }
+}
+function setRecords(newRecords: Record[]) {
+  records.value = newRecords;
+}
 </script>
 
 <template>
-  <main class="container">
-    <h1 class="text-7xl text-red-500">Database Manager</h1>
-    <div class="form">
-      <input v-model.number="key" type="number" placeholder="Key (Integer)" />
-      <input v-model="data" type="text" placeholder="Data" />
-      <button @click="addRecord">Add Record</button>
-      <button @click="findRecord">Find Record</button>
-      <button @click="deleteRecord">Delete Record</button>
-      <button @click="updateRecord">Update Record</button>
+  <main class="flex flex-col p-5 gap-10 justify-center items-center">
+    <h1 class="text-3xl">Database Manager</h1>
+    <div class="flex gap-6">
+      <div class="flex flex-col gap-3">
+        <input v-model.number="key" type="number" placeholder="Key (Integer)" />
+        <input v-model="data" type="text" placeholder="Data" />
+        <AddRecordDialog :setRecords="setRecords"/>
+        <button @click="findRecord">Find Record</button>
+        <button @click="deleteRecord">Delete Record</button>
+        <button @click="updateRecord">Update Record</button>
+      </div>
+      <div>
+        <h2>All Records</h2>
+        <ul class="flex gap-3 flex-col">
+          <li v-for="record in records" :key="record.key">
+            <p>Key: {{ record.key }} Data: {{ record.data }}</p>
+          </li>
+        </ul>
+      </div>
     </div>
+
     <div v-if="record" class="record">
       <h2>Found Record:</h2>
       <p><strong>Key:</strong> {{ record.key }}</p>
       <p><strong>Data:</strong> {{ record.data }}</p>
     </div>
-
-    <h2>All Records</h2>
-    <ul>
-      <li v-for="record in records" :key="record.key">
-        <p><strong>Key:</strong> {{ record.key }}</p>
-        <p><strong>Data:</strong> {{ record.data }}</p>
-      </li>
-    </ul>
   </main>
 </template>
 
@@ -131,16 +89,6 @@ onMounted(() => {
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 }
-
-.container {
-  margin: 0;
-  padding-top: 10vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-}
-
 
 a {
   font-weight: 500;
@@ -185,10 +133,6 @@ button:active {
 input,
 button {
   outline: none;
-}
-
-#greet-input {
-  margin-right: 5px;
 }
 
 @media (prefers-color-scheme: dark) {
