@@ -68,10 +68,34 @@ button {
     outline: none;
 }
 
+
 @media (prefers-color-scheme: dark) {
     :root {
+        --white: hsl(0, 0%, 100%);
+        --black: hsl(240, 15%, 9%);
+        --paragraph: hsl(0, 0%, 83%);
+        --line: hsl(240, 9%, 17%);
+        --primary: hsl(266, 92%, 58%);
+
+        position: relative;
+
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+
         color: #f6f6f6;
-        background: linear-gradient(0deg, hsla(197, 100%, 33%, 1) 0%, hsla(294, 100%, 25%, 1) 100%) fixed;
+        background-attachment: fixed;
+        background-color: hsla(240, 15%, 9%, 1);
+        background-image: radial-gradient(
+                at 88% 40%,
+                hsla(240, 15%, 9%, 1) 0px,
+                transparent 85%
+        ),
+        radial-gradient(at 49% 30%, hsla(240, 15%, 9%, 1) 0px, transparent 85%),
+        radial-gradient(at 14% 26%, hsla(240, 15%, 9%, 1) 0px, transparent 85%),
+        radial-gradient(at 0% 64%, hsla(263, 93%, 56%, 1) 0px, transparent 85%),
+        radial-gradient(at 41% 94%, hsla(284, 100%, 84%, 1) 0px, transparent 85%),
+        radial-gradient(at 100% 99%, hsla(306, 100%, 57%, 1) 0px, transparent 85%);
     }
 
     a:hover {

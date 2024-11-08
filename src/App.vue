@@ -39,8 +39,8 @@ function setRecords(newRecords: Record[]) {
 
 <template>
   <main class="flex flex-col p-5 gap-10 justify-center items-center">
-
-    <h1 class="text-3xl">Database Manager</h1>
+    <div class="body__border"></div>
+    <h1 class="text-3xl fade-header font-semibold tracking-wider">Database Manager</h1>
     <div class="flex gap-6 w-full">
       <DatabaseTable :records="records"/>
 
@@ -62,7 +62,12 @@ function setRecords(newRecords: Record[]) {
   </main>
 </template>
 
-<style>
+<style scoped>
+.fade-header {
+  background: -webkit-linear-gradient(0deg, #aaf, #3a338b40);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
 
 </style>

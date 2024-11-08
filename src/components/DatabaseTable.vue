@@ -16,14 +16,14 @@ const pageCount = computed(() => Math.ceil(props.records.length / itemsPerPage.v
   <v-data-table
       theme="dark"
       v-model:page="page"
-      class="rounded-lg"
+      class="rounded-lg shadow-lg border custom-bg overflow-hidden"
       :items="props.records"
       :items-per-page="itemsPerPage"
   >
     <template v-slot:top>
       <v-text-field
           :model-value="itemsPerPage"
-          class="pa-2"
+          class="pa-2 text-white"
           label="Items per page"
           max="15"
           min="0"
@@ -38,6 +38,7 @@ const pageCount = computed(() => Math.ceil(props.records.length / itemsPerPage.v
         <v-pagination
             v-model="page"
             :length="pageCount"
+            class="bg-black/30 text-white p-2 rounded"
         ></v-pagination>
       </div>
     </template>
@@ -45,5 +46,8 @@ const pageCount = computed(() => Math.ceil(props.records.length / itemsPerPage.v
 </template>
 
 <style scoped>
-
+.custom-bg {
+  background: #00000050;
+  backdrop-filter: blur(50px);
+}
 </style>
