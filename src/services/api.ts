@@ -52,10 +52,10 @@ export async function deleteRecordApi(key: Ref<number | null>) {
     }
 }
 
-export async function updateRecordApi(key: Ref<number | null>, data: Record | null) {
-    if (key.value !== null && data) {
+export async function updateRecordApi(record: Record | null) {
+    if (record !== null && record.key !== null && record.data) {
         try {
-            await invoke("update_record", { key: key.value, newData: data });
+            await invoke("update_record", { key: record.key, newData: record.data });
         } catch (error) {
             console.error("Error updating record:", error);
         }
