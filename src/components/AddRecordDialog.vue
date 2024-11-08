@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, defineProps} from 'vue';
+import {ref} from 'vue';
 import {
   TransitionRoot,
   TransitionChild,
@@ -9,15 +9,8 @@ import {
 } from '@headlessui/vue';
 import { addRecordApi, loadAllRecordsApi } from '../services/api';
 
-// Оголошення пропсів і емісії
-const props = defineProps({
-  setRecords: {
-    type: Function,
-    required: true,
-  },
-});
+const emit = defineEmits(['update:records']);
 
-// Створення ref в дочірньому компоненті
 const key = ref<number | null>(null);
 const data = ref<string>('');
 const isOpen = ref(false);
@@ -25,7 +18,7 @@ const isOpen = ref(false);
 async function addRecord() {
   await addRecordApi(key, data);
   const newRecords = await loadAllRecordsApi();
-  props.setRecords(newRecords);
+  emit('update:records', newRecords);
 }
 
 function closeModal() {
@@ -51,7 +44,7 @@ async function submitModal() {
         type="button"
         @click="openModal"
     >
-      Add record
+        Add Record
     </button>
 
   <TransitionRoot appear :show="isOpen" as="template">

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import {ref} from 'vue';
 import {
   TransitionRoot,
@@ -8,19 +7,17 @@ import {
   DialogPanel,
   DialogTitle,
 } from '@headlessui/vue';
-import { updateRecordApi, loadAllRecordsApi } from '../services/api';
+import {findRecordApi, loadAllRecordsApi} from '../services/api';
+import {Record} from "../types";
 
 const emit = defineEmits(['update:records']);
 
 const key = ref<number | null>(null);
-const data = ref<string>('');
 const isOpen = ref(false);
+const record = ref<Record | null>(null);
 
-async function updateRecord() {
-  if (key.value === null || data.value === '') {
-    return;
-  }
-  await updateRecordApi({key: key.value, data: data.value});
+async function findRecord() {
+  await findRecordApi(key, record);
   const newRecords = await loadAllRecordsApi();
   emit('update:records', newRecords);
 }
@@ -33,20 +30,21 @@ function openModal() {
 }
 
 async function submitModal() {
-  await updateRecord();
+  if (key.value === null) {
+    return;
+  }
+  await findRecord();
   key.value = null;
-  data.value = '';
-  closeModal();
 }
 </script>
 
 <template>
-  <button
-      type="button"
-      @click="openModal"
-  >
-    Update record
-  </button>
+    <button
+        type="button"
+        @click="openModal"
+    >
+        Find Record
+    </button>
 
   <TransitionRoot appear :show="isOpen" as="template">
     <Dialog as="div" @close="closeModal" class="relative z-10">
@@ -75,16 +73,23 @@ async function submitModal() {
           >
             <DialogPanel class="w-full max-w-md transform overflow-hidden rounded-xl bg-[#2f2f2f] p-6 text-left align-middle shadow-xl transition-all">
               <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-300">
-                Update Record
+                Find Record
               </DialogTitle>
               <div class="mt-2">
                 <p class="text-sm text-gray-400">
-                  Please provide both key and new data.
+                  Please provide the key of the record you want to find.
                 </p>
               </div>
               <div class="mt-2 flex flex-col gap-2">
                 <input v-model.number="key" type="number" placeholder="Key (Integer)" />
-                <input v-model="data" type="text" placeholder="New data" />
+              </div>
+              <div v-if="record" class="mt-2 flex flex-col gap-1">
+                <h2 class="text-lg">Found Record:</h2>
+                <p><strong>Key:</strong> {{ record.key }}</p>
+                <p><strong>Data:</strong> {{ record.data }}</p>
+              </div>
+              <div v-else class="mt-2">
+                <h2 class="text-lg">Record was not found(((</h2>
               </div>
               <div class="mt-4 flex justify-between">
                 <button
@@ -111,5 +116,4 @@ async function submitModal() {
 </template>
 
 <style scoped>
-
 </style>

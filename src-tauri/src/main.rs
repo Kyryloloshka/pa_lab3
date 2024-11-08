@@ -82,15 +82,18 @@ impl Database {
         None
     }
 
-    fn delete_record(&mut self, key: i32) {
+    fn delete_record(&mut self, key: i32) -> Option<Record> {
         if let Some(&position) = self.index.get(&key) {
-            self.index.remove(&key);
-            self.data_file.seek(SeekFrom::Start(position)).unwrap();
-            self.data_file.write_all(b"{\"deleted\":true}\n").unwrap(); // Маркуємо запис як видалений
-            println!("Record marked as deleted");
-        } else {
-            println!("Key not found");
+            if let Some(record) = self.find_record(key) {
+                self.index.remove(&key);
+                self.data_file.seek(SeekFrom::Start(position)).unwrap();
+                self.data_file.write_all(b"{\"deleted\":true}\n").unwrap();
+                println!("Record marked as deleted");
+                return Some(record);
+            }
         }
+        println!("Key not found");
+        None
     }
 
     fn update_record(&mut self, key: i32, new_data: String) {
