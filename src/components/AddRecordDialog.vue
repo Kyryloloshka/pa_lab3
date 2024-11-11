@@ -72,7 +72,7 @@ async function submitModal() {
               leave-from="opacity-100 scale-100"
               leave-to="opacity-0 scale-95"
           >
-            <DialogPanel class="w-full max-w-md transform overflow-hidden rounded-xl bg-[#2f2f2f] p-6 text-left align-middle shadow-xl transition-all">
+            <DialogPanel class="w-full max-w-md transform overflow-hidden rounded-xl bg-[#201a3d77] backdrop-blur-2xl p-6 text-left align-middle shadow-xl transition-all">
               <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-300">
                 Add Record
               </DialogTitle>
